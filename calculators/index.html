@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Construction Calculators | Millimetre Estimating Limited</title>
+    <meta name="description" content="Use Millimetre Estimating construction calculators for mortar mix quantities, approximate material costs, and brick, block, and mortar quantity estimating.">
+    <link rel="canonical" href="https://www.millimetre.ltd/calculators/">
+    <meta property="og:title" content="Construction Calculators | Millimetre Estimating Limited">
+    <meta property="og:description" content="Use Millimetre Estimating construction calculators for mortar mix quantities, approximate material costs, and brick, block, and mortar quantity estimating.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.millimetre.ltd/calculators/">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <script src="../assets/js/site-config.js" defer></script>
+    <script src="../assets/js/site.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="../" aria-label="Millimetre Estimating home">
+          <span class="brand-mark">Millimetre Estimating Limited</span>
+          <div class="brand-tagline">Email: info@millimetre.ltd | Mob: 07798 631399</div>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" data-nav-toggle>
+          Menu
+        </button>
+
+        <nav class="site-nav" id="primary-navigation" aria-label="Primary" data-site-nav>
+          <ul>
+            <li><a href="../">Home</a></li>
+            <li><a href="../about/">About Us</a></li>
+            <li><a href="../services/">Services</a></li>
+            <li><a href="../contact/">Contact Us</a></li>
+          </ul>
+          <div class="header-actions">
+            <a class="button button-primary" href="../contact/">Request A Quote</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="page-hero">
+        <div class="container">
+          <div class="eyebrow">Calculators</div>
+          <h1>Practical calculators for mortar mix and wall quantity estimating.</h1>
+          <p>
+            These calculators provide early-stage estimating support for mortar materials and
+            approximate brick, block, and mortar quantities. All assumptions remain editable so
+            the results can be adjusted to suit the project.
+          </p>
+        </div>
+      </section>
+
+      <section class="section section-muted">
+        <div class="container">
+          <div class="section-intro">
+            <div class="eyebrow">Mortar Mix Calculator</div>
+            <h2>Estimate mortar ingredient quantities and approximate material cost.</h2>
+            <p>
+              Select a standard mortar mix such as `4:1`, `5:1`, or `6:1`, or enter a custom
+              cement-to-sand ratio. The calculator uses a dry-volume allowance so the output is
+              more practical for ordering materials.
+            </p>
+          </div>
+
+          <div class="calculator-layout">
+            <article class="calculator-card">
+              <form class="calculator-form" data-calculator="mortar-mix">
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="mortar-volume">Required Mortar Volume (m3)</label>
+                    <input id="mortar-volume" name="mortarVolume" type="number" min="0" step="0.01" value="0.30">
+                  </div>
+
+                  <div class="field">
+                    <label for="mortar-mix-select">Standard Mix</label>
+                    <select id="mortar-mix-select" name="mixPreset">
+                      <option value="3">3:1 Cement : Sand</option>
+                      <option value="4" selected>4:1 Cement : Sand</option>
+                      <option value="5">5:1 Cement : Sand</option>
+                      <option value="6">6:1 Cement : Sand</option>
+                      <option value="custom">Custom Ratio</option>
+                    </select>
+                  </div>
+
+                  <div class="field">
+                    <label for="mortar-custom-ratio">Custom Sand Parts</label>
+                    <input id="mortar-custom-ratio" name="customRatio" type="number" min="1" step="0.5" value="4">
+                  </div>
+
+                  <div class="field">
+                    <label for="mortar-waste">Dry Volume / Waste Factor</label>
+                    <input id="mortar-waste" name="wasteFactor" type="number" min="1" step="0.01" value="1.33">
+                  </div>
+
+                  <div class="field">
+                    <label for="bag-volume">One Cement Bag Yield (m3)</label>
+                    <input id="bag-volume" name="bagVolume" type="number" min="0.01" step="0.001" value="0.035">
+                  </div>
+
+                  <div class="field">
+                    <label for="sand-bulk-density">Sand Bulk Density (kg/m3)</label>
+                    <input id="sand-bulk-density" name="sandDensity" type="number" min="1000" step="10" value="1600">
+                  </div>
+
+                  <div class="field">
+                    <label for="cement-bag-cost">Cement Cost Per Bag (£)</label>
+                    <input id="cement-bag-cost" name="cementCost" type="number" min="0" step="0.01" value="7.50">
+                  </div>
+
+                  <div class="field">
+                    <label for="sand-cost-tonne">Sand Cost Per Tonne (£)</label>
+                    <input id="sand-cost-tonne" name="sandCostPerTonne" type="number" min="0" step="0.01" value="55.00">
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button class="button button-primary" type="button" data-calc-action="calculate-mortar-mix">Calculate Mix</button>
+                </div>
+              </form>
+            </article>
+
+            <article class="calculator-card calculator-results" data-results="mortar-mix" aria-live="polite">
+              <h3>Results</h3>
+              <div class="result-grid">
+                <div class="result-item">
+                  <span class="result-label">Mix Used</span>
+                  <strong data-result="mixUsed">4:1</strong>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Cement Bags</span>
+                  <strong data-result="cementBags">0</strong>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Sand Volume</span>
+                  <strong data-result="sandVolume">0.00 m3</strong>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Sand Weight</span>
+                  <strong data-result="sandWeight">0 kg</strong>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Approx. Material Cost</span>
+                  <strong data-result="totalCost">£0.00</strong>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Approx. Cost / m3</span>
+                  <strong data-result="costPerM3">£0.00</strong>
+                </div>
+              </div>
+              <p class="form-note">
+                This is an early-stage material guide only. It does not replace a formal project
+                estimate or ordering review.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="section-intro">
+            <div class="eyebrow">Brick, Block &amp; Mortar Quantities</div>
+            <h2>Estimate unit counts, mortar volume, and a broad material allowance.</h2>
+            <p>
+              This calculator estimates single-skin wall quantities based on the selected unit
+              size, adjustable joint thickness, and a project-specific waste allowance.
+            </p>
+          </div>
+
+          <div class="calculator-layout">
+            <article class="calculator-card">
+              <form class="calculator-form" data-calculator="wall-estimator">
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="unit-type">Unit Type</label>
+                    <select id="unit-type" name="unitType">
+                      <option value="brick" selected>Brick 215 x 102.5 x 65 mm</option>
+                      <option value="block100">Block 440 x 100 x 215 mm</option>
+                      <option value="block140">Block 440 x 140 x 215 mm</option>
+                      <option value="block215">Block 440 x 215 x 215 mm</option>
+                    </select>
+                  </div>
+
+                  <div class="field">
+                    <label for="wall-length">Wall Length (m)</label>
+                    <input id="wall-length" name="wallLength" type="number" min="0" step="0.01" value="10">
+                  </div>
+
+                  <div class="field">
+                    <label for="wall-height">Wall Height (m)</label>
+                    <input id="wall-height" name="wallHeight" type="number" min="0" step="0.01" value="2.4">
+                  </div>
+
+                  <div class="field">
+                    <label for="openings-area">Openings Area (m2)</label>
+                    <input id="openings-area" name="openingsArea" type="number" min="0" step="0.01" value="0">
+                  </div>
+
+                  <div class="field">
+                    <label for="joint-thickness">Mortar Joint Thickness (mm)</label>
+                    <input id="joint-thickness" name="jointThickness" type="number" min="5" step="1" value="10">
+                  </div>
+
+                  <div class="field">
+                    <label for="waste-percent">Waste Allowance (%)</label>
+                    <input id="waste-percent" name="wastePercent" type="number" min="0" step="0.5" value="5">
+                  </div>
+
+                  <div class="field">
+                    <label for="unit-cost">Unit Cost Each (£)</label>
+                    <input id="unit-cost" name="unitCost" type="number" min="0" step="0.01" value="0.85">
+                  </div>
+
+                  <div class="field">
+                    <label for="mortar-cost-m3">Mortar Cost Per m3 (£)</label>
+                    <input id="mortar-cost-m3" name="mortarCostPerM3" type="number" min="0" step="0.01" value="145.00">
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button class="button button-primary" type="button" data-calc-action="calculate-wall-estimator">Estimate Quantities</button>
+                </div>
+              </form>
+            </article>
+
+            <article class="calculator-card calculator-results" data-results="wall-estimator" aria-live="polite">
+              <h3>Results</h3>
+              <div class="result-grid">
+                <div class="result-item">
+                  <span class="result-label">Net Wall Area</span>
+                  <strong data-result="netArea">0.00 m2</strong>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Units Required</span>
+                  <strong data-result="unitsRequired">0</strong>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Units Inc. Waste</span>
+                  <strong data-result="unitsWithWaste">0</strong>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Approx. Mortar Volume</span>
+                  <strong data-result="mortarVolume">0.00 m3</strong>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Unit Material Cost</span>
+                  <strong data-result="unitMaterialCost">£0.00</strong>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Approx. Total Cost</span>
+                  <strong data-result="totalEstimatedCost">£0.00</strong>
+                </div>
+              </div>
+              <p class="form-note">
+                This tool is intended for indicative budgeting only. Project-specific detailing,
+                bonding, returns, openings, and specification changes can materially affect the
+                final requirement.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-muted">
+        <div class="container">
+          <div class="cta-band">
+            <div>
+              <div class="eyebrow">Need More Than A Calculator?</div>
+              <h2>Use the tools for early guidance, then contact us for a formal estimate.</h2>
+              <p>
+                For project-specific pricing, measured take-offs, or tender support, the next step
+                is to send over the drawings and scope for review.
+              </p>
+            </div>
+            <div class="cta-actions">
+              <a class="button button-primary" href="../contact/">Contact Us</a>
+              <a class="button button-secondary" href="mailto:info@millimetre.ltd">Email Us</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <a class="brand" href="../">
+              <span class="brand-mark">Millimetre Estimating Limited</span>
+              <div class="brand-tagline">Email: info@millimetre.ltd | Mob: 07798 631399</div>
+            </a>
+            <p>
+              Construction estimating, quantity surveying, tendering, and commercial support from
+              Glasgow for clients across Scotland and the wider UK.
+            </p>
+            <p class="footer-company-meta"><strong>Company Reg:</strong> SC765980</p>
+            <p class="footer-company-meta"><strong>Address:</strong> Office 2/3, 2nd Floor, 48 West George Street, Glasgow, G2 1BP</p>
+            <div class="footer-socials" aria-label="Direct contact links">
+              <a class="footer-social-link" href="https://wa.me/447798631399?text=Hello%20Millimetre%20Estimating%20Limited" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              <a class="footer-social-link" href="mailto:info@millimetre.ltd">Email</a>
+            </div>
+          </div>
+          <div>
+            <h2 class="footer-title">Navigation</h2>
+            <ul class="footer-list">
+              <li><a href="../">Home</a></li>
+              <li><a href="../about/">About Us</a></li>
+              <li><a href="../services/">Services</a></li>
+              <li><a href="../contact/">Contact Us</a></li>
+              <li><a href="../calculators/">Calculators</a></li>
+            </ul>
+          </div>
+          <div>
+            <h2 class="footer-title">Legal & Contact</h2>
+            <ul class="footer-list">
+              <li><a href="../privacy/">Privacy Policy</a></li>
+              <li><a href="../cookies/">Cookie Policy</a></li>
+              <li><a href="../terms/">Terms &amp; Conditions</a></li>
+              <li><a href="mailto:info@millimetre.ltd">info@millimetre.ltd</a></li>
+              <li><a href="tel:07798631399">07798 631399</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-meta">
+          Copyright <span data-year></span> Millimetre Estimating Limited. All rights reserved.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
