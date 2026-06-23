@@ -57,6 +57,7 @@ const setConsentState = (status) => {
 };
 
 let analyticsLoaded = false;
+let clarityLoaded = false;
 
 const loadGoogleAnalytics = () => {
   const measurementId = SITE_CONFIG.gaMeasurementId;
@@ -82,10 +83,29 @@ const loadGoogleAnalytics = () => {
   window.gtag("config", measurementId);
 };
 
-const applyConsentState = (consentState) => {
-  if (consentState?.status === "accepted") {
-    loadGoogleAnalytics();
-  }
+const loadMicrosoftClarity = () => {
+  const projectId = SITE_CONFIG.clarityProjectId;
+  if (!projectId || clarityLoaded) return;
+
+  clarityLoaded = true;
+
+  (function (c, l, a, r, i, t, y) {
+    c[a] =
+      c[a] ||
+      function () {
+        (c[a].q = c[a].q || []).push(arguments);
+      };
+    t = l.createElement(r);
+    t.async = 1;
+    t.src = `https://www.clarity.ms/tag/${i}`;
+    y = l.getElementsByTagName(r)[0];
+    y.parentNode.insertBefore(t, y);
+  })(window, document, "clarity", "script", projectId);
+};
+
+const applyTracking = () => {
+  loadGoogleAnalytics();
+  loadMicrosoftClarity();
 };
 
 const createCookieControls = () => {
@@ -95,16 +115,15 @@ const createCookieControls = () => {
   banner.innerHTML = `
     <div class="cookie-banner-panel">
       <div>
-        <strong>Cookie Preferences</strong>
+        <strong>Privacy Notice</strong>
         <p>
-          This website can use analytics cookies to help understand site usage after launch.
-          You can accept or reject analytics cookies before Google Analytics is enabled.
-          Read the <a href="/privacy/">Privacy Policy</a> and <a href="/cookies/">Cookie Policy</a>.
+          This website uses Google Analytics and Microsoft Clarity to measure usage and
+          understand visitor behaviour. Read the <a href="/privacy/">Privacy Policy</a> and
+          <a href="/cookies/">Cookie Policy</a> for more information.
         </p>
       </div>
       <div class="cookie-banner-actions">
-        <button class="button button-secondary" type="button" data-cookie-action="reject">Reject Analytics</button>
-        <button class="button button-primary" type="button" data-cookie-action="accept">Accept Analytics</button>
+        <button class="button button-primary" type="button" data-cookie-action="dismiss">Dismiss</button>
       </div>
     </div>
   `;
@@ -112,7 +131,7 @@ const createCookieControls = () => {
   const settingsButton = document.createElement("button");
   settingsButton.className = "cookie-settings-button";
   settingsButton.type = "button";
-  settingsButton.textContent = "Cookie Settings";
+  settingsButton.textContent = "Privacy Notice";
 
   const openBanner = () => {
     banner.classList.remove("is-hidden");
@@ -125,17 +144,9 @@ const createCookieControls = () => {
   };
 
   banner
-    .querySelector('[data-cookie-action="accept"]')
+    .querySelector('[data-cookie-action="dismiss"]')
     ?.addEventListener("click", () => {
-      const consentState = setConsentState("accepted");
-      applyConsentState(consentState);
-      closeBanner();
-    });
-
-  banner
-    .querySelector('[data-cookie-action="reject"]')
-    ?.addEventListener("click", () => {
-      setConsentState("rejected");
+      setConsentState("dismissed");
       closeBanner();
     });
 
@@ -269,4 +280,4 @@ if (document.querySelector('[data-calculator="wall-estimator"]')) {
 }
 
 createCookieControls();
-applyConsentState(getConsentState());
+applyTracking();

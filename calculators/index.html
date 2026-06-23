@@ -11,6 +11,12 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.millimetre.ltd/calculators/">
     <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="../assets/img/favicon/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="../assets/img/favicon/favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="../assets/img/favicon/favicon-96x96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="../assets/img/favicon/site.webmanifest">
+    <meta name="theme-color" content="#efe6d9">
     <link rel="stylesheet" href="../assets/css/main.css">
     <script src="../assets/js/site-config.js" defer></script>
     <script src="../assets/js/site.js" defer></script>
@@ -70,6 +76,26 @@
 
           <div class="calculator-layout">
             <article class="calculator-card">
+              <div class="calculator-visual" aria-hidden="true">
+                <div class="visual-header">
+                  <span class="visual-badge">Mortar Mix</span>
+                  <span class="visual-formula">cement + sand = mortar</span>
+                </div>
+                <div class="symbol-grid">
+                  <div class="symbol-card">
+                    <img class="symbol-image" src="../assets/img/cement.png" alt="">
+                    <span>Cement Bags</span>
+                  </div>
+                  <div class="symbol-card">
+                    <img class="symbol-image" src="../assets/img/sand.png" alt="">
+                    <span>Sand Volume</span>
+                  </div>
+                  <div class="symbol-card">
+                    <img class="symbol-image" src="../assets/img/mortar.png" alt="">
+                    <span>Mortar Output</span>
+                  </div>
+                </div>
+              </div>
               <form class="calculator-form" data-calculator="mortar-mix">
                 <div class="form-grid">
                   <div class="field">
@@ -175,6 +201,26 @@
 
           <div class="calculator-layout">
             <article class="calculator-card">
+              <div class="calculator-visual" aria-hidden="true">
+                <div class="visual-header">
+                  <span class="visual-badge">Wall Estimate</span>
+                  <span class="visual-formula">length x height - openings</span>
+                </div>
+                <div class="symbol-grid">
+                  <div class="symbol-card">
+                    <img class="symbol-image" src="../assets/img/brick.png" alt="">
+                    <span>Brick / Block Count</span>
+                  </div>
+                  <div class="symbol-card">
+                    <img class="symbol-image" src="../assets/img/wall.png" alt="">
+                    <span>Wall Area</span>
+                  </div>
+                  <div class="symbol-card">
+                    <img class="symbol-image" src="../assets/img/opening.png" alt="">
+                    <span>Openings Removed</span>
+                  </div>
+                </div>
+              </div>
               <form class="calculator-form" data-calculator="wall-estimator">
                 <div class="form-grid">
                   <div class="field">

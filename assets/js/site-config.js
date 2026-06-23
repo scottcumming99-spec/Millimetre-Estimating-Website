@@ -1,7 +1,6 @@
 window.ME_SITE_CONFIG = {
-  // Paste your GA4 measurement ID here after the live site is on GitHub Pages.
-  // Example: "G-XXXXXXXXXX"
-  gaMeasurementId: "",
+  gaMeasurementId: "G-9B3DJ2M0GV",
+  clarityProjectId: "xb77ic3be4",
 
   // Increase this if you materially change the consent setup and need to ask again.
   cookieConsentVersion: "2025-07-22",
