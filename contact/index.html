@@ -82,12 +82,7 @@
           <article class="contact-card">
             <div class="eyebrow">Enquiry Form</div>
             <h2>Request a response</h2>
-            <form class="contact-form" action="https://formsubmit.co/info@millimetre.ltd" method="POST" enctype="multipart/form-data">
-              <input type="hidden" name="_subject" value="Website enquiry - Millimetre Estimating Limited">
-              <input type="hidden" name="_captcha" value="true">
-              <input type="hidden" name="_template" value="table">
-              <input type="text" name="_honey" class="visually-hidden" tabindex="-1" autocomplete="off">
-
+            <form class="contact-form" data-contact-form>
               <div class="form-grid">
                 <div class="field">
                   <label for="name">Full Name</label>
@@ -148,15 +143,17 @@
                 <label for="attachment">Attach Files</label>
                 <input id="attachment" name="attachment" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.zip">
                 <p class="form-note">
-                  The website uses a static form submission service. File support depends on the
-                  limits of that service and should be tested before launch.
+                  Your enquiry email will be prepared automatically. If you select files here,
+                  add them to the email draft before sending because GitHub Pages does not upload
+                  attachments directly.
                 </p>
               </div>
 
               <div class="form-actions">
-                <button class="button button-primary" type="submit">Submit Enquiry</button>
+                <button class="button button-primary" type="submit">Prepare Enquiry Email</button>
                 <a class="button button-secondary" href="mailto:info@millimetre.ltd">Email Instead</a>
               </div>
+              <p class="form-status" data-form-status role="status" aria-live="polite"></p>
             </form>
           </article>
         </div>
@@ -199,6 +196,7 @@
             <div class="footer-socials" aria-label="Direct contact links">
               <a class="footer-social-link" href="https://wa.me/447798631399?text=Hello%20Millimetre%20Estimating%20Limited" target="_blank" rel="noopener noreferrer">WhatsApp</a>
               <a class="footer-social-link" href="mailto:info@millimetre.ltd">Email</a>
+              <a class="footer-social-link" href="https://www.facebook.com/share/1BCHfPD5ax/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">Facebook</a>
             </div>
           </div>
           <div>

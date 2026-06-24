@@ -28,6 +28,9 @@ document.querySelectorAll("[data-year]").forEach((node) => {
 });
 
 const SITE_CONFIG = window.ME_SITE_CONFIG || {};
+const CONTACT_EMAIL = SITE_CONFIG.contactEmail || "info@millimetre.ltd";
+const SITE_URL = SITE_CONFIG.siteUrl || window.location.origin;
+const COMPANY_NAME = "Millimetre Estimating Limited";
 const COOKIE_CONSENT_KEY = `me_cookie_consent_${
   SITE_CONFIG.cookieConsentVersion || "v1"
 }`;
@@ -163,6 +166,116 @@ const createCookieControls = () => {
   }
 };
 
+const setStatusMessage = (node, message, isError = false) => {
+  if (!node) return;
+  node.textContent = message;
+  node.classList.toggle("is-error", isError);
+};
+
+const copyToClipboard = async (value) => {
+  if (!navigator.clipboard?.writeText) return false;
+
+  try {
+    await navigator.clipboard.writeText(value);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const buildContactEnquiry = (form) => {
+  const getValue = (name) => form.elements.namedItem(name)?.value?.trim() || "";
+  const attachmentField = form.elements.namedItem("attachment");
+  const attachmentNames =
+    attachmentField instanceof HTMLInputElement && attachmentField.files
+      ? Array.from(attachmentField.files).map((file) => file.name)
+      : [];
+
+  const rows = [
+    ["Full Name", getValue("name")],
+    ["Company / Client Type", getValue("company")],
+    ["Email Address", getValue("email")],
+    ["Telephone", getValue("phone")],
+    ["Project Location", getValue("project_location")],
+    ["Service Required", getValue("service")],
+    ["Project Type", getValue("project_type")],
+    ["Required Return Date", getValue("required_return_date")],
+    ["Project / Tender Details", getValue("message")],
+  ];
+
+  if (attachmentNames.length) {
+    rows.push(["Files To Attach Separately", attachmentNames.join(", ")]);
+  }
+
+  const populatedRows = rows.filter(([, value]) => value);
+  const nameForSubject = getValue("name") || "New enquiry";
+  const serviceForSubject = getValue("service");
+  const subject = `Website enquiry - ${nameForSubject}${
+    serviceForSubject ? ` - ${serviceForSubject}` : ""
+  }`;
+  const body = [
+    `Website enquiry submitted via ${SITE_URL}`,
+    "",
+    ...populatedRows.map(([label, value]) => `${label}: ${value}`),
+    "",
+    `Please reply to: ${getValue("email") || CONTACT_EMAIL}`,
+  ].join("\n");
+
+  return { subject, body, attachmentNames };
+};
+
+const setupContactForm = () => {
+  const form = document.querySelector("[data-contact-form]");
+  const statusNode = document.querySelector("[data-form-status]");
+  if (!(form instanceof HTMLFormElement) || !statusNode) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (typeof form.reportValidity === "function" && !form.reportValidity()) {
+      return;
+    }
+
+    const { subject, body, attachmentNames } = buildContactEnquiry(form);
+    const copied = await copyToClipboard(body);
+    const maxBodyLength = 1800;
+    const isTruncated = body.length > maxBodyLength;
+    const mailtoBody = isTruncated
+      ? `${body.slice(0, maxBodyLength)}\n\n[The full enquiry has been copied to your clipboard if supported.]`
+      : body;
+
+    window.location.href = `mailto:${encodeURIComponent(
+      CONTACT_EMAIL
+    )}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailtoBody)}`;
+
+    const messages = [
+      `An email draft to ${CONTACT_EMAIL} should open now.`,
+    ];
+
+    if (attachmentNames.length) {
+      messages.push(
+        `Add your selected file${
+          attachmentNames.length > 1 ? "s" : ""
+        } to the email before sending.`
+      );
+    }
+
+    if (copied) {
+      messages.push(
+        isTruncated
+          ? "The full enquiry has also been copied to your clipboard in case the draft body is shortened."
+          : "A copy of the enquiry has also been copied to your clipboard."
+      );
+    } else {
+      messages.push(
+        "If your email app does not open, email info@millimetre.ltd directly and paste in your enquiry details."
+      );
+    }
+
+    setStatusMessage(statusNode, messages.join(" "));
+  });
+};
+
 const formatNumber = (value, decimals = 2) =>
   Number(value).toLocaleString("en-GB", {
     minimumFractionDigits: decimals,
@@ -187,6 +300,214 @@ const readNumber = (form, name, fallback = 0) => {
 const setResult = (container, key, value) => {
   const target = container.querySelector(`[data-result="${key}"]`);
   if (target) target.textContent = value;
+};
+
+const getControlDisplayValue = (control) => {
+  if (
+    control instanceof HTMLSelectElement &&
+    control.selectedOptions &&
+    control.selectedOptions[0]
+  ) {
+    return control.selectedOptions[0].textContent.trim();
+  }
+
+  if (control instanceof HTMLInputElement && control.type === "file") {
+    return control.files?.length
+      ? Array.from(control.files)
+          .map((file) => file.name)
+          .join(", ")
+      : "None selected";
+  }
+
+  if (
+    control instanceof HTMLInputElement ||
+    control instanceof HTMLTextAreaElement
+  ) {
+    return control.value.trim() || "Not provided";
+  }
+
+  return "Not provided";
+};
+
+const extractFormRows = (form) =>
+  Array.from(form.querySelectorAll(".field")).map((field) => {
+    const label = field.querySelector("label")?.textContent?.trim() || "Field";
+    const control = field.querySelector("input, select, textarea");
+    return {
+      label,
+      value: getControlDisplayValue(control),
+    };
+  });
+
+const extractResultRows = (results) =>
+  Array.from(results.querySelectorAll(".result-item")).map((item) => ({
+    label: item.querySelector(".result-label")?.textContent?.trim() || "Result",
+    value: item.querySelector("strong")?.textContent?.trim() || "-",
+  }));
+
+const drawRoundedRect = (ctx, x, y, width, height, radius) => {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+};
+
+const drawRows = (ctx, rows, x, y, width, title) => {
+  const padding = 30;
+  const rowHeight = 56;
+  const headerHeight = 74;
+  const height = headerHeight + rows.length * rowHeight + 18;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.strokeStyle = "rgba(95, 67, 48, 0.12)";
+  ctx.lineWidth = 2;
+  drawRoundedRect(ctx, x, y, width, height, 20);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#5f4330";
+  ctx.font = "700 28px Georgia, serif";
+  ctx.fillText(title, x + padding, y + 42);
+
+  ctx.strokeStyle = "rgba(95, 67, 48, 0.12)";
+  ctx.beginPath();
+  ctx.moveTo(x + padding, y + headerHeight - 10);
+  ctx.lineTo(x + width - padding, y + headerHeight - 10);
+  ctx.stroke();
+
+  rows.forEach((row, index) => {
+    const rowY = y + headerHeight + index * rowHeight;
+    ctx.fillStyle = "#7b5a42";
+    ctx.font = "600 18px Arial, sans-serif";
+    ctx.fillText(row.label, x + padding, rowY + 24);
+
+    ctx.fillStyle = "#241d18";
+    ctx.font = "700 22px Arial, sans-serif";
+    ctx.fillText(row.value, x + padding, rowY + 48);
+  });
+
+  return height;
+};
+
+const exportCalculatorAsImage = (type) => {
+  const definition = calculatorExportDefinitions[type];
+  const form = document.querySelector(`[data-calculator="${type}"]`);
+  const results = document.querySelector(`[data-results="${type}"]`);
+  const statusNode = document.querySelector(`[data-export-status="${type}"]`);
+
+  if (!definition || !form || !results) {
+    setStatusMessage(statusNode, "The calculator export could not be prepared.", true);
+    return;
+  }
+
+  definition.recalculate();
+
+  const inputRows = extractFormRows(form);
+  const resultRows = extractResultRows(results);
+
+  const width = 1400;
+  const topSectionHeight = 260;
+  const cardHeight =
+    74 + Math.max(inputRows.length, resultRows.length) * 56 + 18;
+  const height = topSectionHeight + cardHeight + 190;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    setStatusMessage(statusNode, "The browser could not generate the export image.", true);
+    return;
+  }
+
+  const gradient = ctx.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, "#fbf8f3");
+  gradient.addColorStop(1, "#efe6d9");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.save();
+  ctx.translate(width / 2, height / 2);
+  ctx.rotate((-18 * Math.PI) / 180);
+  ctx.fillStyle = "rgba(95, 67, 48, 0.06)";
+  ctx.font = "700 100px Georgia, serif";
+  ctx.textAlign = "center";
+  ctx.fillText(COMPANY_NAME, 0, 0);
+  ctx.restore();
+
+  ctx.fillStyle = "#5f4330";
+  ctx.font = "700 28px Arial, sans-serif";
+  ctx.fillText(COMPANY_NAME.toUpperCase(), 72, 72);
+
+  ctx.fillStyle = "#241d18";
+  ctx.font = "700 54px Georgia, serif";
+  ctx.fillText(definition.title, 72, 145);
+
+  ctx.fillStyle = "#5a4d43";
+  ctx.font = "500 24px Arial, sans-serif";
+  ctx.fillText(
+    `Generated ${new Date().toLocaleString("en-GB")} | ${SITE_URL.replace(
+      "https://",
+      ""
+    )}`,
+    72,
+    192
+  );
+
+  ctx.fillStyle = "#7b5a42";
+  ctx.font = "500 22px Arial, sans-serif";
+  ctx.fillText(
+    `Indicative estimate only | Email: ${CONTACT_EMAIL} | Company Reg: SC765980`,
+    72,
+    230
+  );
+
+  const leftX = 72;
+  const rightX = 716;
+  const cardY = 286;
+  const cardWidth = 612;
+  drawRows(ctx, inputRows, leftX, cardY, cardWidth, "Inputs");
+  drawRows(ctx, resultRows, rightX, cardY, cardWidth, "Results");
+
+  ctx.fillStyle = "#5a4d43";
+  ctx.font = "500 22px Arial, sans-serif";
+  ctx.fillText(
+    "Prepared from the Millimetre Estimating online calculator tools.",
+    72,
+    height - 82
+  );
+  ctx.fillText(
+    "For project-specific pricing, tender support, or formal measurement, contact Millimetre Estimating Limited.",
+    72,
+    height - 46
+  );
+
+  const link = document.createElement("a");
+  const slugDate = new Date().toISOString().slice(0, 10);
+  link.download = `millimetre-${definition.filePrefix}-${slugDate}.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+
+  setStatusMessage(
+    statusNode,
+    "PNG export downloaded with Millimetre branding and watermark."
+  );
+};
+
+const setupCalculatorExports = () => {
+  document.querySelectorAll("[data-export-calculator]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const type = button.getAttribute("data-export-calculator");
+      if (type) exportCalculatorAsImage(type);
+    });
+  });
 };
 
 const calculateMortarMix = () => {
@@ -268,6 +589,19 @@ const calculateWallEstimator = () => {
   setResult(results, "totalEstimatedCost", formatCurrency(totalEstimatedCost));
 };
 
+const calculatorExportDefinitions = {
+  "mortar-mix": {
+    title: "Mortar Mix Calculator",
+    filePrefix: "mortar-mix",
+    recalculate: calculateMortarMix,
+  },
+  "wall-estimator": {
+    title: "Brick, Block & Mortar Quantities",
+    filePrefix: "wall-estimator",
+    recalculate: calculateWallEstimator,
+  },
+};
+
 document.querySelector('[data-calc-action="calculate-mortar-mix"]')?.addEventListener("click", calculateMortarMix);
 document.querySelector('[data-calc-action="calculate-wall-estimator"]')?.addEventListener("click", calculateWallEstimator);
 
@@ -279,5 +613,7 @@ if (document.querySelector('[data-calculator="wall-estimator"]')) {
   calculateWallEstimator();
 }
 
+setupContactForm();
+setupCalculatorExports();
 createCookieControls();
 applyTracking();
