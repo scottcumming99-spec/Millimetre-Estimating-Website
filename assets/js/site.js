@@ -30,7 +30,14 @@ document.querySelectorAll("[data-year]").forEach((node) => {
 const SITE_CONFIG = window.ME_SITE_CONFIG || {};
 const CONTACT_EMAIL = SITE_CONFIG.contactEmail || "info@millimetre.ltd";
 const SITE_URL = SITE_CONFIG.siteUrl || window.location.origin;
+const CONTACT_FORM_ENDPOINT = SITE_CONFIG.contactFormEndpoint || "";
+const CONTACT_FORM_SUCCESS_MESSAGE =
+  SITE_CONFIG.contactFormSuccessMessage ||
+  "Thanks. Your enquiry has been sent and will be reviewed shortly.";
 const COMPANY_NAME = "Millimetre Estimating Limited";
+const prefersReducedMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)"
+).matches;
 const COOKIE_CONSENT_KEY = `me_cookie_consent_${
   SITE_CONFIG.cookieConsentVersion || "v1"
 }`;
@@ -120,13 +127,14 @@ const createCookieControls = () => {
       <div>
         <strong>Privacy Notice</strong>
         <p>
-          This website uses Google Analytics and Microsoft Clarity to measure usage and
-          understand visitor behaviour. Read the <a href="/privacy/">Privacy Policy</a> and
+          We use analytics cookies to understand how the website is used and to improve the
+          experience. Read the <a href="/privacy/">Privacy Policy</a> and
           <a href="/cookies/">Cookie Policy</a> for more information.
         </p>
       </div>
       <div class="cookie-banner-actions">
-        <button class="button button-primary" type="button" data-cookie-action="dismiss">Dismiss</button>
+        <button class="button button-primary" type="button" data-cookie-action="accept">Accept Analytics</button>
+        <button class="button button-secondary" type="button" data-cookie-action="decline">Decline Optional Cookies</button>
       </div>
     </div>
   `;
@@ -134,7 +142,7 @@ const createCookieControls = () => {
   const settingsButton = document.createElement("button");
   settingsButton.className = "cookie-settings-button";
   settingsButton.type = "button";
-  settingsButton.textContent = "Privacy Notice";
+  settingsButton.textContent = "Cookie Settings";
 
   const openBanner = () => {
     banner.classList.remove("is-hidden");
@@ -147,9 +155,17 @@ const createCookieControls = () => {
   };
 
   banner
-    .querySelector('[data-cookie-action="dismiss"]')
+    .querySelector('[data-cookie-action="accept"]')
     ?.addEventListener("click", () => {
-      setConsentState("dismissed");
+      setConsentState("accepted");
+      applyTracking();
+      closeBanner();
+    });
+
+  banner
+    .querySelector('[data-cookie-action="decline"]')
+    ?.addEventListener("click", () => {
+      setConsentState("declined");
       closeBanner();
     });
 
@@ -158,7 +174,13 @@ const createCookieControls = () => {
   document.body.appendChild(banner);
   document.body.appendChild(settingsButton);
 
-  if (getConsentState()) {
+  const consent = getConsentState();
+
+  if (consent?.status === "accepted") {
+    applyTracking();
+  }
+
+  if (consent) {
     banner.classList.add("is-hidden");
     settingsButton.classList.add("is-visible");
   } else {
@@ -170,6 +192,7 @@ const setStatusMessage = (node, message, isError = false) => {
   if (!node) return;
   node.textContent = message;
   node.classList.toggle("is-error", isError);
+  node.classList.toggle("is-success", !isError && Boolean(message));
 };
 
 const copyToClipboard = async (value) => {
@@ -224,10 +247,53 @@ const buildContactEnquiry = (form) => {
   return { subject, body, attachmentNames };
 };
 
+const updateContactFormMode = (form) => {
+  const modeNoteNode = form.querySelector("[data-form-mode-note]");
+  const attachmentNoteNode = form.querySelector("[data-attachment-note]");
+  const submitLabelNode = form.querySelector("[data-form-submit-label]");
+  const hasDirectSubmission = Boolean(CONTACT_FORM_ENDPOINT);
+
+  if (modeNoteNode) {
+    modeNoteNode.innerHTML = hasDirectSubmission
+      ? "<strong>Direct website submission is enabled.</strong> Send your project or tender details here and they will be received through the website."
+      : "<strong>Your email app will open on submit.</strong> The form prepares a structured enquiry email so you can review it and send it immediately.";
+  }
+
+  if (attachmentNoteNode) {
+    attachmentNoteNode.textContent = hasDirectSubmission
+      ? "Add drawings, tender documents, or supporting files here if they are relevant to the enquiry."
+      : "If you add drawings, tender documents, or supporting files here, attach them in your email app after the draft opens.";
+  }
+
+  if (submitLabelNode) {
+    submitLabelNode.textContent = hasDirectSubmission
+      ? "Send Enquiry"
+      : "Open Email To Send";
+  }
+};
+
+const submitContactFormToEndpoint = async (form) => {
+  const formData = new FormData(form);
+  const response = await fetch(CONTACT_FORM_ENDPOINT, {
+    method: "POST",
+    body: formData,
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Direct form submission failed.");
+  }
+};
+
 const setupContactForm = () => {
   const form = document.querySelector("[data-contact-form]");
   const statusNode = document.querySelector("[data-form-status]");
+  const submitButton = form?.querySelector("[data-form-submit]");
   if (!(form instanceof HTMLFormElement) || !statusNode) return;
+
+  updateContactFormMode(form);
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -236,44 +302,181 @@ const setupContactForm = () => {
       return;
     }
 
-    const { subject, body, attachmentNames } = buildContactEnquiry(form);
-    const copied = await copyToClipboard(body);
-    const maxBodyLength = 1800;
-    const isTruncated = body.length > maxBodyLength;
-    const mailtoBody = isTruncated
-      ? `${body.slice(0, maxBodyLength)}\n\n[The full enquiry has been copied to your clipboard if supported.]`
-      : body;
-
-    window.location.href = `mailto:${encodeURIComponent(
-      CONTACT_EMAIL
-    )}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailtoBody)}`;
-
-    const messages = [
-      `An email draft to ${CONTACT_EMAIL} should open now.`,
-    ];
-
-    if (attachmentNames.length) {
-      messages.push(
-        `Add your selected file${
-          attachmentNames.length > 1 ? "s" : ""
-        } to the email before sending.`
-      );
+    submitButton?.setAttribute("aria-busy", "true");
+    if (submitButton instanceof HTMLButtonElement) {
+      submitButton.disabled = true;
     }
+    setStatusMessage(statusNode, "");
 
-    if (copied) {
-      messages.push(
-        isTruncated
-          ? "The full enquiry has also been copied to your clipboard in case the draft body is shortened."
-          : "A copy of the enquiry has also been copied to your clipboard."
+    try {
+      if (CONTACT_FORM_ENDPOINT) {
+        await submitContactFormToEndpoint(form);
+        form.reset();
+        setStatusMessage(statusNode, CONTACT_FORM_SUCCESS_MESSAGE);
+        return;
+      }
+
+      const { subject, body, attachmentNames } = buildContactEnquiry(form);
+      const copied = await copyToClipboard(body);
+      const maxBodyLength = 1800;
+      const isTruncated = body.length > maxBodyLength;
+      const mailtoBody = isTruncated
+        ? `${body.slice(0, maxBodyLength)}\n\n[The full enquiry has been copied to your clipboard if supported.]`
+        : body;
+
+      window.location.href = `mailto:${encodeURIComponent(
+        CONTACT_EMAIL
+      )}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailtoBody)}`;
+
+      const messages = [
+        `An email draft to ${CONTACT_EMAIL} should open now.`,
+      ];
+
+      if (attachmentNames.length) {
+        messages.push(
+          `Add your selected file${
+            attachmentNames.length > 1 ? "s" : ""
+          } to the email before sending.`
+        );
+      }
+
+      if (copied) {
+        messages.push(
+          isTruncated
+            ? "The full enquiry has also been copied to your clipboard in case the draft body is shortened."
+            : "A copy of the enquiry has also been copied to your clipboard."
+        );
+      } else {
+        messages.push(
+          "If your email app does not open, email info@millimetre.ltd directly and paste in your enquiry details."
+        );
+      }
+
+      setStatusMessage(statusNode, messages.join(" "));
+    } catch {
+      setStatusMessage(
+        statusNode,
+        "The enquiry could not be sent through the website right now. Please email info@millimetre.ltd directly or try again shortly.",
+        true
       );
-    } else {
-      messages.push(
-        "If your email app does not open, email info@millimetre.ltd directly and paste in your enquiry details."
-      );
+    } finally {
+      submitButton?.removeAttribute("aria-busy");
+      if (submitButton instanceof HTMLButtonElement) {
+        submitButton.disabled = false;
+      }
     }
-
-    setStatusMessage(statusNode, messages.join(" "));
   });
+};
+
+const setupTestimonialSlider = () => {
+  const slider = document.querySelector("[data-testimonial-slider]");
+  const track = slider?.querySelector("[data-slider-track]");
+  const previousButton = slider?.querySelector("[data-slider-prev]");
+  const nextButton = slider?.querySelector("[data-slider-next]");
+  const statusNode = slider?.querySelector("[data-slider-status]");
+  const slides = track ? Array.from(track.querySelectorAll(".testimonial-card")) : [];
+
+  if (!slider || !track || !previousButton || !nextButton || !statusNode || !slides.length) {
+    return;
+  }
+
+  let activeIndex = 0;
+
+  const getSlideOffsets = () => slides.map((slide) => slide.offsetLeft);
+
+  const updateState = () => {
+    const scrollLeft = track.scrollLeft;
+    const slideOffsets = getSlideOffsets();
+    let nearestIndex = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    slideOffsets.forEach((offset, index) => {
+      const distance = Math.abs(offset - scrollLeft);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = index;
+      }
+    });
+
+    activeIndex = nearestIndex;
+
+    previousButton.disabled = activeIndex === 0;
+    nextButton.disabled = activeIndex === slides.length - 1;
+    statusNode.textContent = `${activeIndex + 1} / ${slides.length}`;
+
+    slides.forEach((slide, index) => {
+      slide.setAttribute("aria-hidden", String(index !== activeIndex));
+    });
+  };
+
+  const scrollToIndex = (nextIndex) => {
+    const boundedIndex = Math.min(slides.length - 1, Math.max(0, nextIndex));
+    const slideOffsets = getSlideOffsets();
+    track.scrollTo({
+      left: slideOffsets[boundedIndex] || 0,
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
+  };
+
+  previousButton.addEventListener("click", () => scrollToIndex(activeIndex - 1));
+  nextButton.addEventListener("click", () => scrollToIndex(activeIndex + 1));
+
+  track.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      scrollToIndex(activeIndex - 1);
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      scrollToIndex(activeIndex + 1);
+    }
+  });
+
+  track.addEventListener("scroll", () => {
+    window.requestAnimationFrame(updateState);
+  });
+
+  window.addEventListener("resize", () => {
+    scrollToIndex(activeIndex);
+    window.requestAnimationFrame(updateState);
+  });
+  updateState();
+};
+
+const setupScrollReveals = () => {
+  const revealTargets = Array.from(
+    document.querySelectorAll(
+      ".section-intro, .stat-card, .preview-card, .service-card, .process-step, .highlight-panel, .surface-panel, .contact-card, .calculator-card, .cta-band, .testimonial-shell, .legal-card"
+    )
+  );
+
+  if (!revealTargets.length) return;
+
+  revealTargets.forEach((target) => {
+    target.classList.add("reveal-on-scroll");
+  });
+
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    revealTargets.forEach((target) => target.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    },
+    {
+      threshold: 0.16,
+      rootMargin: "0px 0px -8% 0px",
+    }
+  );
+
+  revealTargets.forEach((target) => observer.observe(target));
 };
 
 const formatNumber = (value, decimals = 2) =>
@@ -616,4 +819,5 @@ if (document.querySelector('[data-calculator="wall-estimator"]')) {
 setupContactForm();
 setupCalculatorExports();
 createCookieControls();
-applyTracking();
+setupTestimonialSlider();
+setupScrollReveals();

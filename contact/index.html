@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Contact Us | Millimetre Estimating Limited</title>
-    <meta name="description" content="Contact Millimetre Estimating Limited in Glasgow for estimating, tendering, bid writing, and quantity surveying support.">
+    <title>Contact Millimetre Estimating | Estimating Enquiries Across Scotland</title>
+    <meta name="description" content="Contact Millimetre Estimating Limited for contractor-focused construction estimating, tendering support, and commercial enquiries across Scotland and the wider UK.">
     <link rel="canonical" href="https://www.millimetre.ltd/contact/">
-    <meta property="og:title" content="Contact Us | Millimetre Estimating Limited">
-    <meta property="og:description" content="Contact Millimetre Estimating Limited in Glasgow for estimating, tendering, bid writing, and quantity surveying support.">
+    <meta property="og:title" content="Contact Millimetre Estimating | Estimating Enquiries Across Scotland">
+    <meta property="og:description" content="Contact Millimetre Estimating Limited for contractor-focused construction estimating, tendering support, and commercial enquiries across Scotland and the wider UK.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.millimetre.ltd/contact/">
     <meta name="twitter:card" content="summary_large_image">
@@ -41,9 +41,10 @@
             <li><a href="../about/">About Us</a></li>
             <li><a href="../services/">Services</a></li>
             <li><a href="../contact/" aria-current="page">Contact Us</a></li>
+            <li><a href="../calculators/">Calculators</a></li>
           </ul>
           <div class="header-actions">
-            <a class="button button-primary" href="../contact/">Request A Quote</a>
+            <a class="button button-primary" href="../contact/">Request Estimate</a>
           </div>
         </nav>
       </div>
@@ -52,12 +53,12 @@
     <main id="main-content">
       <section class="page-hero">
         <div class="container">
-          <div class="eyebrow">Contact Us</div>
-          <h1>Send your enquiry, project details, or tender information online.</h1>
+          <div class="eyebrow">Contact</div>
+          <h1>Send us your project or tender details.</h1>
           <p>
-            Contact Millimetre Estimating Limited to discuss construction estimating, tendering,
-            bid writing, or quantity surveying support. Project information and supporting files
-            can be submitted directly through the website.
+            Send drawings, tender documents, pricing requirements, or general project information
+            for review. Millimetre Estimating Limited supports contractors across Scotland and the
+            wider UK.
           </p>
         </div>
       </section>
@@ -66,39 +67,46 @@
         <div class="container contact-layout">
           <article class="contact-card">
             <div class="eyebrow">Direct Contact</div>
-            <h2>Contact details</h2>
+            <h2>Speak to us directly</h2>
             <ul class="contact-list">
               <li><strong>Company</strong> Millimetre Estimating Limited</li>
               <li><strong>Email</strong> <a href="mailto:info@millimetre.ltd">info@millimetre.ltd</a></li>
               <li><strong>Mobile</strong> <a href="tel:07798631399">07798 631399</a></li>
-              <li><strong>Location</strong> Glasgow, Scotland</li>
+              <li><strong>Location</strong> Scotland-based, serving projects across the UK</li>
             </ul>
             <p>
-              Suitable files include drawings, specifications, tender documents, schedules, and
-              other supporting information relevant to the enquiry.
+              Suitable for live tenders, project pricing requirements, early-stage budgeting, and
+              commercial support across civils, domestic, commercial, structures, airside,
+              railside, and maritime work.
             </p>
           </article>
 
           <article class="contact-card">
             <div class="eyebrow">Enquiry Form</div>
-            <h2>Request a response</h2>
-            <form class="contact-form" data-contact-form>
+            <h2>Start your enquiry</h2>
+            <form class="contact-form" data-contact-form enctype="multipart/form-data">
+              <div class="form-intro">
+                <p class="form-note" data-form-mode-note>
+                  Complete the form below and your email app will open with a pre-filled enquiry
+                  ready for you to send to us.
+                </p>
+              </div>
               <div class="form-grid">
                 <div class="field">
                   <label for="name">Full Name</label>
-                  <input id="name" name="name" type="text" required>
+                  <input id="name" name="name" type="text" autocomplete="name" required>
                 </div>
                 <div class="field">
                   <label for="company">Company / Client Type</label>
-                  <input id="company" name="company" type="text">
+                  <input id="company" name="company" type="text" autocomplete="organization">
                 </div>
                 <div class="field">
                   <label for="email">Email Address</label>
-                  <input id="email" name="email" type="email" required>
+                  <input id="email" name="email" type="email" autocomplete="email" required>
                 </div>
                 <div class="field">
                   <label for="phone">Telephone</label>
-                  <input id="phone" name="phone" type="tel">
+                  <input id="phone" name="phone" type="tel" autocomplete="tel">
                 </div>
                 <div class="field">
                   <label for="location">Project Location</label>
@@ -136,22 +144,23 @@
 
               <div class="field">
                 <label for="message">Project / Tender Details</label>
-                <textarea id="message" name="message" rows="7" required></textarea>
+                <textarea id="message" name="message" rows="7" placeholder="Drawings available, tender stage, target return date, project scope, and any pricing notes." required></textarea>
               </div>
 
               <div class="field">
                 <label for="attachment">Attach Files</label>
                 <input id="attachment" name="attachment" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.zip">
-                <p class="form-note">
-                  Your enquiry email will be prepared automatically. If you select files here,
-                  add them to the email draft before sending because GitHub Pages does not upload
-                  attachments directly.
+                <p class="form-note" data-attachment-note>
+                  If you select files here, add them to your email after the draft opens so they
+                  are included with the enquiry.
                 </p>
               </div>
 
               <div class="form-actions">
-                <button class="button button-primary" type="submit">Prepare Enquiry Email</button>
-                <a class="button button-secondary" href="mailto:info@millimetre.ltd">Email Instead</a>
+                <button class="button button-primary" type="submit" data-form-submit>
+                  <span data-form-submit-label>Open Email To Send</span>
+                </button>
+                <a class="button button-secondary" href="mailto:info@millimetre.ltd">Email Us Directly</a>
               </div>
               <p class="form-status" data-form-status role="status" aria-live="polite"></p>
             </form>
@@ -164,10 +173,11 @@
           <div class="cta-band">
             <div>
               <div class="eyebrow">Prefer Direct Contact?</div>
-              <h2>Email or call if you would rather discuss the requirement directly.</h2>
+              <h2>Prefer to speak first?</h2>
               <p>
-                The form is there for convenience, but direct email and phone contact remain the
-                quickest route for some enquiries.
+                If you would prefer to speak directly, you can also get in touch by email or phone,
+                especially where tender deadlines or live pricing requirements make that the
+                quickest route.
               </p>
             </div>
             <div class="cta-actions">
@@ -188,8 +198,8 @@
               <div class="brand-tagline">Email: info@millimetre.ltd | Mob: 07798 631399</div>
             </a>
             <p>
-              Construction estimating, quantity surveying, tendering, and commercial support from
-              Glasgow for clients across Scotland and the wider UK.
+              Scotland-based estimating, tendering, and quantity surveying support for projects across
+              the UK.
             </p>
             <p class="footer-company-meta"><strong>Company Reg:</strong> SC765980</p>
             <p class="footer-company-meta"><strong>Address:</strong> Office 2/3, 2nd Floor, 48 West George Street, Glasgow, G2 1BP</p>
